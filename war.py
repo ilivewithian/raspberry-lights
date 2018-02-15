@@ -1,7 +1,6 @@
 import sys
 from sys import stdin
 import logging
-logging.basicConfig()
 from thread import start_new_thread
 status = "pending"
 
@@ -22,6 +21,9 @@ try:
 except ImportError:
 	import _thread as thread
 import time
+
+logging.basicConfig(filename='war.log',format='%(asctime)s %(message)s',level=logging.DEBUG)
+logging.info('starting up...')
 
 brightChanged = False
 pi = pigpio.pi()
@@ -63,17 +65,22 @@ def on_message(ws, message):
 	global status
 	if message.startswith('42["status"'):
 		status = message.split('"')[3]
+		logging.info('status update...%s', status)
 
 def on_error(ws, error):
+	logging.error(error)
 	print(error)
 
 def on_close(ws):
-	print("## closed ##")
+	logging.debug('## closed ##')
+	print('## closed ##')
 
 def on_open(ws):
-	print("open")
+	logging.debug('## open ##')
+	print('## open ##')
 
 def war_loop():
+	logging.debug('entering main loop...')
 	while True:
 		print status
 
@@ -118,6 +125,7 @@ def war_loop():
 start_new_thread(war_loop, ())
 
 if __name__ == "__main__":
+	logging.debug('opening socket...')
 	ws = websocket.WebSocketApp("ws://e1349c1d.ngrok.io/socket.io/?transport=websocket",
 		on_message = on_message,
 		on_error = on_error,
