@@ -69,15 +69,14 @@ def on_message(ws, message):
 
 def on_error(ws, error):
 	logging.error(error)
-	print(error)
 
 def on_close(ws):
 	logging.debug('## closed ##')
-	print('## closed ##')
+	time.sleep(2)
+	init_socket()
 
 def on_open(ws):
 	logging.debug('## open ##')
-	print('## open ##')
 
 def war_loop():
 	logging.debug('entering main loop...')
@@ -124,13 +123,22 @@ def war_loop():
 
 start_new_thread(war_loop, ())
 
-if __name__ == "__main__":
+def init_socket():
 	logging.debug('opening socket...')
+
 	ws = websocket.WebSocketApp("ws://e1349c1d.ngrok.io/socket.io/?transport=websocket",
 		on_message = on_message,
 		on_error = on_error,
 		on_close = on_close)
-	ws.on_open = on_open
-	ws.run_forever()
-	stdin.readline()
-	ws.close()
+
+    ws = websocket.WebSocketApp("ws://echo.websocket.org/",
+        on_message = on_message,
+        on_error = on_error,
+        on_close = on_close)
+
+    ws.on_open = on_open
+
+    ws.run_forever()
+
+if __name__ == "__main__":
+	initiate()
